@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Text } from "tamagui";
 
 export default function TabsLayout() {
+  console.log("TabsLayout component rendered");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {

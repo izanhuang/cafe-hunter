@@ -6,6 +6,7 @@ import { Button, Input, Text, YStack } from "tamagui";
 WebBrowser.maybeCompleteAuthSession();
 
 export default function AccountScreen() {
+  console.log("AccountScreen component rendered");
   const [user, setUser] = useState<any>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,24 +46,17 @@ export default function AccountScreen() {
   };
 
   // const redirectUri = AuthSession.makeRedirectUri({
-  //   native: "true", // use native behavior for redirect URI
+  //   path: "/callback",
+  //   // native: "true", // use native behavior for redirect URI
   // });
 
   const handleGoogleLogin = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      // options: { redirectTo: redirectUri },
+      options: { redirectTo: "http://localhost:8081/callback" },
     });
     if (error) {
       setError(error.message);
-    } else {
-      setTimeout(() => {
-        try {
-          // router.replace("/(tabs)/account"); // or your home screen
-        } catch (e) {
-          console.error("Navigation error after login:", e);
-        }
-      }, 500); // Delay ensures router is hydrated
     }
   };
 

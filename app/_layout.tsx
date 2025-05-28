@@ -15,6 +15,8 @@ export default function RootLayout() {
     return null;
   }
 
+  console.log("app/_layout.tsx: RootLayout component rendered");
+
   return (
     <TamaguiProvider config={config}>
       <Stack>

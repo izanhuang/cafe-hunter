@@ -10,7 +10,7 @@ import { Button, Text, TextArea, XStack, YStack } from "tamagui";
 export default function LeaveReviewScreen() {
   const { id } = useLocalSearchParams();
   const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
+  const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
@@ -19,7 +19,7 @@ export default function LeaveReviewScreen() {
       {
         cafe_id: id,
         rating,
-        comment,
+        description,
       },
     ]);
     setSubmitting(false);
@@ -64,8 +64,8 @@ export default function LeaveReviewScreen() {
       </XStack>
 
       <TextArea
-        value={comment}
-        onChangeText={setComment}
+        value={description}
+        onChangeText={setDescription}
         placeholder="Write your thoughts here..."
         size="$4"
         minHeight={100}
@@ -73,7 +73,7 @@ export default function LeaveReviewScreen() {
 
       <Button
         onPress={handleSubmit}
-        disabled={submitting || rating === 0 || comment.length === 0}
+        disabled={submitting || rating === 0 || description.length === 0}
         theme={submitting ? "alt2" : "active"}
       >
         {submitting ? "Submitting..." : "Submit Review"}
