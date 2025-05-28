@@ -7,4 +7,4 @@ if (!supabaseAnonKey) {
   throw new Error("SUPABASE_KEY is not defined in the environment variables.");
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl!, supabaseAnonKey!);

@@ -5,7 +5,11 @@ module.exports = function (api) {
     plugins: [
       [
         "@tamagui/babel-plugin",
-        { components: ["tamagui"], config: "./tamagui.config.ts" },
+        {
+          config: "./tamagui.config.ts",
+          importsWhitelist: ["constants.js", "colors.js"],
+          logTimings: true,
+        },
       ],
       ["transform-inline-environment-variables", { include: "TAMAGUI_TARGET" }],
       "react-native-reanimated/plugin",

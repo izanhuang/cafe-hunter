@@ -1,12 +1,16 @@
-import { config } from "@tamagui/config/v2";
+import { themes, tokens } from "@tamagui/themes";
 import { createTamagui } from "tamagui";
 
-const tamaguiConfig = createTamagui(config);
+const config = createTamagui({
+  themes,
+  tokens,
+  shorthands: {
+    p: "padding",
+    m: "margin",
+    bg: "backgroundColor",
+  },
+});
 
-export type AppConfig = typeof tamaguiConfig;
+export type AppConfig = typeof config;
 
-declare module "tamagui" {
-  interface TamaguiCustomConfig extends AppConfig {}
-}
-
-export default tamaguiConfig;
+export default config;
