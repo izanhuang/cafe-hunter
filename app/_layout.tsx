@@ -1,12 +1,10 @@
+import { AuthProvider } from "@/context/auth-context";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { TamaguiProvider } from "tamagui";
-import "util";
 import config from "../tamagui.config";
-
-global.Buffer = Buffer;
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -20,11 +18,13 @@ export default function RootLayout() {
 
   return (
     <TamaguiProvider config={config}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
+      <AuthProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </AuthProvider>
     </TamaguiProvider>
   );
 }

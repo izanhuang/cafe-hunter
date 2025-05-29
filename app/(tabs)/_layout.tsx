@@ -1,19 +1,18 @@
+import { useAuth } from "@/context/auth-context";
 import { Tabs } from "expo-router";
-import { useState } from "react";
-import { Text } from "tamagui";
+import { ActivityIndicator } from "react-native";
 
 export default function TabsLayout() {
-  console.log("TabsLayout component rendered");
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const { user, loading } = useAuth();
 
-  if (isLoggedIn === null) return <Text textAlign="center">Loading...</Text>;
+  if (loading) return <ActivityIndicator />;
 
   return (
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen name="index" options={{ title: "Home" }} />
       <Tabs.Screen
         name="account"
-        options={{ title: isLoggedIn ? "Account" : "Login" }}
+        options={{ title: user ? "Account" : "Login" }}
       />
     </Tabs>
   );

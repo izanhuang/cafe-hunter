@@ -1,51 +1,73 @@
-import * as WebBrowser from "expo-web-browser";
+import { getFirebaseAuth } from "@/lib/firebase-auth";
 import {
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
+  GoogleAuthProvider,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Input, Text, YStack } from "tamagui";
-import { auth } from "../../lib/firebase";
-
-WebBrowser.maybeCompleteAuthSession();
+import { useAuth } from "../../context/auth-context";
 
 export default function AccountScreen() {
-  console.log("AccountScreen component rendered");
-  const [user, setUser] = useState<any>(null);
+  const { user, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // Logged in
-    } else {
-      // Logged out
-    }
-  });
+  useEffect(() => {
+    setLoading(authLoading);
+  }, [authLoading]);
 
-  const signup = (email: string, password: string) => {
+  const handleSignup = async () => {
     setLoading(true);
-    createUserWithEmailAndPassword(auth, email, password);
     setError("");
-    setLoading(false);
+    try {
+      const auth = getFirebaseAuth();
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogin = async () => {
     setLoading(true);
-    await signInWithEmailAndPassword(auth, email, password);
     setError("");
-    setLoading(false);
+    try {
+      const auth = getFirebaseAuth();
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleLogin = async () => {};
+  const handleGoogleLogin = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      const auth = getFirebaseAuth();
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider); // ❗ This will not work in Expo Go
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
-    signOut(auth);
-    setUser(null);
+    try {
+      const auth = getFirebaseAuth();
+      await signOut(auth);
+    } catch (err: any) {
+      console.error("Logout error:", err);
+    }
   };
 
   if (!user) {
@@ -66,6 +88,7 @@ export default function AccountScreen() {
           value={email}
           onChangeText={setEmail}
           width="100%"
+          autoCapitalize="none"
         />
         <Input
           placeholder="Password"
@@ -75,11 +98,11 @@ export default function AccountScreen() {
           width="100%"
         />
 
-        {error ? (
+        {error && (
           <Text color="red" fontSize="$4">
             {error}
           </Text>
-        ) : null}
+        )}
 
         <Button
           theme="active"
@@ -90,13 +113,13 @@ export default function AccountScreen() {
           {loading ? "Logging in..." : "Login with Email"}
         </Button>
 
-        <Button onPress={handleGoogleLogin} width="100%">
+        <Button onPress={handleSignup} width="100%">
+          {loading ? "Signing up..." : "Sign Up with Email"}
+        </Button>
+
+        <Button onPress={handleGoogleLogin} width="100%" disabled={loading}>
           Continue with Google
         </Button>
-        {/* 
-        <Button onPress={handleAppleLogin} width="100%">
-          Continue with Apple
-        </Button> */}
       </YStack>
     );
   }

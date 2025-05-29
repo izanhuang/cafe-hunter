@@ -1,22 +1,22 @@
 import { CafeCard } from "@/components/CafeCard";
-import { db } from "@/lib/firebase";
 import { Cafe } from "@/types";
-import { collection, getDocs } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ScrollView, Text, YStack } from "tamagui";
 
 export default function CafesList() {
   const [cafes, setCafes] = useState<Cafe[]>([]);
 
-  useEffect(() => {
-    const fetchCafes = async () => {
-      const querySnapshot = await getDocs(collection(db, "cafes"));
-      setCafes(querySnapshot.docs.map((doc) => ({ ...(doc.data() as Cafe) })));
-      return querySnapshot.docs.map((doc) => ({ ...(doc.data() as Cafe) }));
-    };
+  // useEffect(() => {
+  //   const fetchCafes = async () => {
+  //     const querySnapshot = await getDocs(collection(db, "cafes"));
+  //     const cafesData = querySnapshot.docs.map((doc) => ({
+  //       ...(doc.data() as Cafe),
+  //     }));
+  //     setCafes(cafesData);
+  //   };
 
-    fetchCafes();
-  }, []);
+  //   fetchCafes();
+  // }, []);
 
   return (
     <ScrollView contentContainerStyle={{ padding: 16 }}>
