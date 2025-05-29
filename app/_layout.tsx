@@ -3,7 +3,10 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { TamaguiProvider } from "tamagui";
+import "util";
 import config from "../tamagui.config";
+
+global.Buffer = Buffer;
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -14,8 +17,6 @@ export default function RootLayout() {
     // Async font loading only occurs in development.
     return null;
   }
-
-  console.log("app/_layout.tsx: RootLayout component rendered");
 
   return (
     <TamaguiProvider config={config}>

@@ -1,5 +1,6 @@
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/firebase";
 import { useLocalSearchParams } from "expo-router";
+import { addDoc, collection } from "firebase/firestore";
 import {
   StarIcon as StarFilled,
   Star as StarOutline,
@@ -15,19 +16,12 @@ export default function LeaveReviewScreen() {
 
   const handleSubmit = async () => {
     setSubmitting(true);
-    const { error } = await supabase.from("reviews").insert([
-      {
-        cafe_id: id,
-        rating,
-        description,
-      },
-    ]);
+    const docRef = await addDoc(collection(db, "reviews"), {
+      cafe_id: id,
+      rating,
+      description,
+    });
     setSubmitting(false);
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Review submitted!");
-    }
   };
 
   return (

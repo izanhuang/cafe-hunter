@@ -1,6 +1,5 @@
 import { CafeInfo } from "@/components/CafeInfo";
 import { ReviewCard } from "@/components/ReviewCard";
-import { supabase } from "@/lib/supabase";
 import { Cafe, Review } from "@/types";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -16,19 +15,18 @@ export default function CafeDetailScreen() {
     if (!id) return;
 
     const fetchCafeData = async () => {
-      const { data: cafeData } = await supabase
-        .from("cafes")
-        .select("*")
-        .eq("id", id)
-        .single();
-      const { data: reviewData } = await supabase
-        .from("reviews")
-        .select("*")
-        .eq("cafe_id", id)
-        .order("created_at", { ascending: false });
-
-      if (cafeData) setCafe(cafeData);
-      if (reviewData) setReviews(reviewData);
+      // const { data: cafeData } = await supabase
+      //   .from("cafes")
+      //   .select("*")
+      //   .eq("id", id)
+      //   .single();
+      // const { data: reviewData } = await supabase
+      //   .from("reviews")
+      //   .select("*")
+      //   .eq("cafe_id", id)
+      //   .order("created_at", { ascending: false });
+      // if (cafeData) setCafe(cafeData);
+      // if (reviewData) setReviews(reviewData);
     };
 
     fetchCafeData();

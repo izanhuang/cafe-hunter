@@ -1,7 +1,13 @@
-import { supabase } from "@/lib/supabase";
 import * as WebBrowser from "expo-web-browser";
-import { useEffect, useState } from "react";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+import { useState } from "react";
 import { Button, Input, Text, YStack } from "tamagui";
+import { auth } from "../../lib/firebase";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -13,71 +19,32 @@ export default function AccountScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user);
-      console.log("data.user", data.user);
-    };
-    getUser();
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // Logged in
+    } else {
+      // Logged out
+    }
+  });
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-
-    return () => {
-      listener?.subscription.unsubscribe();
-    };
-  }, []);
-
-  const handleLogin = async () => {
+  const signup = (email: string, password: string) => {
     setLoading(true);
+    createUserWithEmailAndPassword(auth, email, password);
     setError("");
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) setError(error.message);
-    const { data } = await supabase.auth.getUser();
-    setUser(data.user);
     setLoading(false);
   };
 
-  // const redirectUri = AuthSession.makeRedirectUri({
-  //   path: "/callback",
-  //   // native: "true", // use native behavior for redirect URI
-  // });
-
-  const handleGoogleLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: "http://localhost:8081/callback" },
-    });
-    if (error) {
-      setError(error.message);
-    }
+  const handleLogin = async () => {
+    setLoading(true);
+    await signInWithEmailAndPassword(auth, email, password);
+    setError("");
+    setLoading(false);
   };
 
-  // const handleAppleLogin = async () => {
-  //   const { data, error } = await supabase.auth.signInWithOAuth({
-  //     provider: "apple",
-  //     options: { redirectTo: redirectUri },
-  //   });
-  //   if (error) setError(error.message);
-  // };
-
-  // useEffect(() => {
-  //   const redirectUri = AuthSession.makeRedirectUri({
-  //     scheme: "cafe-hunter",
-  //   });
-
-  //   console.log("Redirect URI:", redirectUri);
-  // }, []);
+  const handleGoogleLogin = async () => {};
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    signOut(auth);
     setUser(null);
   };
 

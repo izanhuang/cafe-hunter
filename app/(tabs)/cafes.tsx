@@ -1,6 +1,7 @@
 import { CafeCard } from "@/components/CafeCard";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/firebase";
 import { Cafe } from "@/types";
+import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { ScrollView, Text, YStack } from "tamagui";
 
@@ -9,8 +10,9 @@ export default function CafesList() {
 
   useEffect(() => {
     const fetchCafes = async () => {
-      const { data, error } = await supabase.from("cafes").select("*");
-      if (!error && data) setCafes(data);
+      const querySnapshot = await getDocs(collection(db, "cafes"));
+      setCafes(querySnapshot.docs.map((doc) => ({ ...(doc.data() as Cafe) })));
+      return querySnapshot.docs.map((doc) => ({ ...(doc.data() as Cafe) }));
     };
 
     fetchCafes();
@@ -18,7 +20,7 @@ export default function CafesList() {
 
   return (
     <ScrollView contentContainerStyle={{ padding: 16 }}>
-      <YStack space="$4">
+      <YStack gap="$4">
         <Text fontSize="$8" fontWeight="800">
           Explore Cafes
         </Text>
