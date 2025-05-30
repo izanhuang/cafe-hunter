@@ -2,8 +2,15 @@ import { CafeInfo } from "@/components/cafe/CafeInfo";
 import { ReviewCard } from "@/components/cafe/ReviewCard";
 import { db } from "@/lib/firebase-firestore";
 import { Cafe, Review } from "@/types";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Button, ScrollView, Text, YStack } from "tamagui";
 
@@ -34,7 +41,11 @@ export default function CafeDetailScreen() {
           id as string,
           "reviews"
         );
-        const reviewsSnapshot = await getDocs(reviewsCollectionRef);
+        const reviewsQuery = query(
+          reviewsCollectionRef,
+          orderBy("createdAt", "desc")
+        );
+        const reviewsSnapshot = await getDocs(reviewsQuery);
         const reviewsData = reviewsSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -56,35 +67,39 @@ export default function CafeDetailScreen() {
     );
 
   return (
-    <ScrollView padding="$4" space="$4">
-      <CafeInfo cafe={cafe} />
+    <>
+      <Stack.Screen options={{ title: cafe.name }} />
 
-      <Button
-        theme="active"
-        onPress={() =>
-          router.push({
-            pathname: "/cafe/leave-review",
-            params: { id: cafe.id },
-          })
-        }
-      >
-        Leave a Review
-      </Button>
+      <ScrollView padding="$4" space="$4">
+        <CafeInfo cafe={cafe} />
 
-      <YStack space="$3">
-        <Text fontSize="$6" fontWeight="700">
-          Reviews
-        </Text>
-        {reviews.length === 0 ? (
-          <Text color="$gray10">
-            No reviews yet. Be the first to leave one!
+        <Button
+          theme="active"
+          onPress={() =>
+            router.push({
+              pathname: "/cafe/leave-review",
+              params: { id: cafe.id },
+            })
+          }
+        >
+          Leave a Review
+        </Button>
+
+        <YStack space="$3">
+          <Text fontSize="$6" fontWeight="700">
+            Reviews
           </Text>
-        ) : (
-          reviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
-          ))
-        )}
-      </YStack>
-    </ScrollView>
+          {reviews.length === 0 ? (
+            <Text color="$gray10">
+              No reviews yet. Be the first to leave one!
+            </Text>
+          ) : (
+            reviews.map((review) => (
+              <ReviewCard key={review.id} review={review} />
+            ))
+          )}
+        </YStack>
+      </ScrollView>
+    </>
   );
 }

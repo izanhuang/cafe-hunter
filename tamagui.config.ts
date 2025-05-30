@@ -1,5 +1,16 @@
-import { themes, tokens } from "@tamagui/themes";
+import { themes as defaultThemes, tokens } from "@tamagui/themes";
 import { createTamagui } from "tamagui";
+
+export const themes = {
+  ...defaultThemes,
+  disabled: {
+    background: "#cccccc",
+    color: "#666666",
+    borderColor: "#cccccc",
+    hoverBackground: "#dddddd",
+    pressBackground: "#bbbbbb",
+  },
+};
 
 const config = createTamagui({
   themes,

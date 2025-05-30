@@ -116,9 +116,9 @@ export default function AccountScreen() {
         Sign Up with Email
       </Button>
 
-      <Button theme="active" disabled={!request} onPress={() => promptAsync()}>
+      {/* <Button theme="active" disabled={!request} onPress={() => promptAsync()}>
         {loading ? "Signing in with Google..." : "Sign in with Google"}
-      </Button>
+      </Button> */}
     </>
   );
 }

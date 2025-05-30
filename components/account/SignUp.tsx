@@ -2,6 +2,7 @@ import { getFirebaseAuth } from "@/lib/firebase-auth";
 import { db } from "@/lib/firebase-firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import { Eye, EyeOff } from "lucide-react-native";
 import { useState } from "react";
 import {
   Button,
@@ -10,6 +11,7 @@ import {
   ScrollView,
   Select,
   Text,
+  XStack,
   YStack,
 } from "tamagui";
 
@@ -24,8 +26,37 @@ export default function SignUp({
   const [email, setEmail] = useState("");
   const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [birthdayError, setBirthdayError] = useState(""); // State for birthday validation error
+
+  // Validation function for birthday format
+  const validateBirthday = (date: string) => {
+    const regex = /^\d{4}\/\d{2}\/\d{2}$/; // Regex for YYYY/MM/DD format
+    if (!regex.test(date)) {
+      setBirthdayError("Birthday must be in YYYY/MM/DD format");
+    } else {
+      setBirthdayError("");
+    }
+    setBirthday(date);
+  };
+
+  const isFormValid = () => {
+    return (
+      firstName.trim() !== "" &&
+      lastName.trim() !== "" &&
+      birthday.trim() !== "" &&
+      birthdayError === "" && // Ensure birthday is valid
+      email.trim() !== "" &&
+      gender.trim() !== "" &&
+      password.trim() !== "" &&
+      confirmPassword.trim() !== "" &&
+      password === confirmPassword
+    );
+  };
 
   const handleSignUp = async () => {
     setLoading(true);
@@ -40,7 +71,6 @@ export default function SignUp({
       );
       const user = userCredential.user;
 
-      // Create a Firestore document for the user
       const userDocRef = doc(db, "users", user.uid);
       await setDoc(userDocRef, {
         firstName,
@@ -52,8 +82,8 @@ export default function SignUp({
       });
 
       console.log("✅ User signed up and Firestore document created!");
-    } catch (err: any) {
-      setError(err.message);
+    } catch {
+      setError("There was an error signing up");
     } finally {
       setLoading(false);
     }
@@ -63,17 +93,24 @@ export default function SignUp({
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
       showsVerticalScrollIndicator={false}
+      width={"100%"}
     >
-      <YStack space="$4" padding="$4" maxWidth={400} alignSelf="center">
+      <YStack
+        space="$4"
+        padding="$4"
+        maxWidth={400}
+        width={"100%"}
+        alignSelf="center"
+      >
         <Button theme="alt1" onPress={() => setIsSignUp(false)}>
-          Back to Login
+          <Text>Back to Login</Text>
         </Button>
         <Text fontSize="$8" fontWeight="800" textAlign="center">
           Sign Up
         </Text>
 
         <YStack space="$3">
-          <Label htmlFor="firstName">First Name</Label>
+          <Label htmlFor="firstName">First Name *</Label>
           <Input
             id="firstName"
             placeholder="First Name"
@@ -84,7 +121,7 @@ export default function SignUp({
         </YStack>
 
         <YStack space="$3">
-          <Label htmlFor="lastName">Last Name</Label>
+          <Label htmlFor="lastName">Last Name *</Label>
           <Input
             id="lastName"
             placeholder="Last Name"
@@ -95,18 +132,21 @@ export default function SignUp({
         </YStack>
 
         <YStack space="$3">
-          <Label htmlFor="birthday">Birthday</Label>
+          <Label htmlFor="birthday">Birthday *</Label>
           <Input
             id="birthday"
-            placeholder="YYYY-MM-DD"
+            placeholder="YYYY/MM/DD"
             value={birthday}
-            onChangeText={setBirthday}
+            onChangeText={validateBirthday} // Validate birthday format
             width="100%"
           />
+          <Text color="red" fontSize="$4" textAlign="center">
+            {birthdayError}
+          </Text>
         </YStack>
 
         <YStack space="$3">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">Email *</Label>
           <Input
             id="email"
             placeholder="Email"
@@ -118,7 +158,7 @@ export default function SignUp({
         </YStack>
 
         <YStack space="$3">
-          <Label htmlFor="gender">Gender</Label>
+          <Label htmlFor="gender">Gender *</Label>
           <Select id="gender" value={gender} onValueChange={setGender}>
             <Select.Trigger
               width="100%"
@@ -146,33 +186,87 @@ export default function SignUp({
           </Select>
         </YStack>
 
+        {/* Password Input with Toggle */}
         <YStack space="$3">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            width="100%"
-          />
+          <Label htmlFor="password">Password *</Label>
+          <XStack
+            alignItems="center"
+            borderWidth={1}
+            borderColor="$gray5"
+            borderRadius="$2"
+          >
+            <Input
+              id="password"
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!passwordVisible} // Toggle visibility
+              flex={1}
+              paddingRight="$4"
+            />
+            <Button
+              onPress={() => setPasswordVisible(!passwordVisible)}
+              theme="alt1"
+              size="$2"
+              circular
+            >
+              {passwordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
+            </Button>
+          </XStack>
         </YStack>
 
-        {error && (
-          <Text color="red" fontSize="$4" textAlign="center">
-            {error}
-          </Text>
-        )}
+        {/* Confirm Password Input with Toggle */}
+        <YStack space="$3">
+          <Label htmlFor="confirmPassword">Confirm Password *</Label>
+          <XStack
+            alignItems="center"
+            borderWidth={1}
+            borderColor="$gray5"
+            borderRadius="$2"
+          >
+            <Input
+              id="confirmPassword"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!confirmPasswordVisible} // Toggle visibility
+              flex={1}
+              paddingRight="$4"
+            />
+            <Button
+              onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+              theme="alt1"
+              size="$2"
+              circular
+            >
+              {confirmPasswordVisible ? (
+                <EyeOff size={20} />
+              ) : (
+                <Eye size={20} />
+              )}
+            </Button>
+          </XStack>
+          {password !== confirmPassword && confirmPassword.trim() !== "" && (
+            <Text color="red" fontSize="$4" textAlign="center">
+              Passwords do not match
+            </Text>
+          )}
+        </YStack>
 
         <Button
-          theme="active"
+          theme={isFormValid() && !loading ? "active" : "disabled"}
           onPress={handleSignUp}
-          disabled={loading}
+          disabled={!isFormValid() || loading}
           size="$4"
           marginTop="$4"
         >
-          {loading ? "Signing up..." : "Sign Up"}
+          <Text theme={isFormValid() && !loading ? "active" : "disabled"}>
+            {loading ? "Signing up..." : "Sign Up"}
+          </Text>
         </Button>
+        <Text color="red" fontSize="$4" textAlign="center">
+          {error}
+        </Text>
       </YStack>
     </ScrollView>
   );

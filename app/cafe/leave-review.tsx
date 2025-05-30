@@ -1,6 +1,6 @@
 import { getFirebaseAuth } from "@/lib/firebase-auth";
 import { db } from "@/lib/firebase-firestore";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 import {
   StarIcon as StarFilled,
@@ -15,6 +15,8 @@ export default function LeaveReviewScreen() {
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const auth = getFirebaseAuth();
@@ -44,8 +46,10 @@ export default function LeaveReviewScreen() {
       // Reset form
       setDescription("");
       setRating(0);
+      router.push(`/cafe/${cafeId}`);
     } catch (error) {
       console.error("Failed to submit review:", error);
+      setError("Failed to submit review. Please try again later.");
     } finally {
       setSubmitting(false);
     }
@@ -102,6 +106,9 @@ export default function LeaveReviewScreen() {
       >
         {submitting ? "Submitting..." : "Submit Review"}
       </Button>
+      <Text color="red" fontSize="$4" textAlign="center">
+        {error}
+      </Text>
     </YStack>
   );
 }
