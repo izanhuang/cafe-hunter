@@ -1,5 +1,5 @@
-import Login from "@/components/Login";
-import Profile from "@/components/Profile";
+import Login from "@/components/account/Login";
+import Profile from "@/components/account/Profile";
 import { Text, YStack } from "tamagui";
 import { useAuth } from "../../context/auth-context";
 

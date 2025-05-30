@@ -31,14 +31,15 @@ export default function LeaveReviewScreen() {
       setSubmitting(true);
 
       const review = {
-        cafeId,
         rating,
-        comment: description.trim(),
+        description: description.trim(),
         createdAt: Timestamp.now(),
         userId,
       };
 
-      await addDoc(collection(db, "reviews"), review);
+      // Add the review to the cafe's subcollection "reviews"
+      const reviewsCollectionRef = collection(db, "cafes", cafeId, "reviews");
+      await addDoc(reviewsCollectionRef, review);
 
       // Reset form
       setDescription("");

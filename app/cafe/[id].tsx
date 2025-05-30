@@ -1,7 +1,9 @@
-import { CafeInfo } from "@/components/CafeInfo";
-import { ReviewCard } from "@/components/ReviewCard";
+import { CafeInfo } from "@/components/cafe/CafeInfo";
+import { ReviewCard } from "@/components/cafe/ReviewCard";
+import { db } from "@/lib/firebase-firestore";
 import { Cafe, Review } from "@/types";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Button, ScrollView, Text, YStack } from "tamagui";
 
@@ -12,24 +14,38 @@ export default function CafeDetailScreen() {
   const [reviews, setReviews] = useState<Review[]>([]);
 
   useEffect(() => {
-    if (!id) return;
+    const fetchCafeDetails = async () => {
+      if (!id) return;
 
-    const fetchCafeData = async () => {
-      // const { data: cafeData } = await supabase
-      //   .from("cafes")
-      //   .select("*")
-      //   .eq("id", id)
-      //   .single();
-      // const { data: reviewData } = await supabase
-      //   .from("reviews")
-      //   .select("*")
-      //   .eq("cafe_id", id)
-      //   .order("created_at", { ascending: false });
-      // if (cafeData) setCafe(cafeData);
-      // if (reviewData) setReviews(reviewData);
+      try {
+        // Fetch cafe details
+        const cafeDocRef = doc(db, "cafes", id as string);
+        const cafeDoc = await getDoc(cafeDocRef);
+        if (cafeDoc.exists()) {
+          setCafe({ id: cafeDoc.id, ...cafeDoc.data() } as Cafe);
+        } else {
+          console.warn("Cafe not found");
+        }
+
+        // Fetch reviews
+        const reviewsCollectionRef = collection(
+          db,
+          "cafes",
+          id as string,
+          "reviews"
+        );
+        const reviewsSnapshot = await getDocs(reviewsCollectionRef);
+        const reviewsData = reviewsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Review[];
+        setReviews(reviewsData);
+      } catch (error) {
+        console.error("Error fetching cafe details or reviews:", error);
+      }
     };
 
-    fetchCafeData();
+    fetchCafeDetails();
   }, [id]);
 
   if (!cafe)

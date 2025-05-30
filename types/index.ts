@@ -1,35 +1,32 @@
 export type Cafe = {
   id: string; // UUID
-  name: string;
-  description?: string; // Optional description
   address: string;
   city: string;
-  state: string;
-  zip_code: string;
-  latitude: number;
-  longitude: number;
-  google_maps_url?: string;
-  website_url?: string;
-  phone_number?: string;
+  createdAt: string; // ISO date string
+  description?: string;
+  geopoint?: {
+    latitude: number;
+    longitude: number;
+  };
   hours?: Record<string, string>; // Example: { "mon": "8am - 5pm", "tue": "8am - 5pm", ... }
-  created_at: string; // ISO date string
-  updated_at?: string; // Optional
+  name: string;
+  googleMapsUrl?: string;
+  websiteUrl?: string;
+  phoneNumber?: string;
+  updatedAt?: string;
 };
 
 export type Review = {
   id: string; // UUID
-  cafe_id: string; // Foreign key to Cafe
-  user_name?: string; // Optional, only if user is logged in
-  email?: string; // Optional, only if user is logged in
-  rating: number; // Overall rating out of 5
-  recommend: boolean; // Would you recommend this cafe?
-  is_cozy: boolean;
-  is_busy: boolean;
-  coffee_rating: number; // Out of 5
-  food_rating: number; // Out of 5
-  space_rating: number; // Seating/space out of 5
-  work_friendly: boolean; // Can you work from here?
-  loudness: number; // Scale 1-5 (quiet to loud)
+  atmosphere: number; // Seating/space out of 5
+  createdAt: string; // ISO timestamp
+  coffee: number; // Out of 5
   description?: string; // Optional free text
-  created_at: string; // ISO timestamp
+  food: number; // Out of 5
+  isBusy: boolean;
+  isCozy: boolean;
+  isWorkFriendly: boolean; // Can you work from here?
+  loudness: number; // Scale 1-5 (quiet to loud)
+  rating: number; // Overall rating out of 5
+  userId: string; // User ID of the reviewer
 };

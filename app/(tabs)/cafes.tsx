@@ -1,4 +1,4 @@
-import { CafeCard } from "@/components/CafeCard";
+import { CafeCard } from "@/components/cafe/CafeCard";
 import { db } from "@/lib/firebase-firestore";
 import { Cafe } from "@/types";
 import { collection, getDocs } from "firebase/firestore";
@@ -11,9 +11,14 @@ export default function CafesList() {
   useEffect(() => {
     const fetchCafes = async () => {
       const querySnapshot = await getDocs(collection(db, "cafes"));
-      const cafesData = querySnapshot.docs.map((doc) => ({
-        ...(doc.data() as Cafe),
-      }));
+      const cafesData = querySnapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          } as Cafe)
+      );
+      console.log("Fetched cafes:", cafesData);
       setCafes(cafesData);
     };
 

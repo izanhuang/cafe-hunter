@@ -1,18 +1,22 @@
 import { getFirebaseAuth } from "@/lib/firebase-auth";
+import { db } from "@/lib/firebase-firestore";
 import * as Google from "expo-auth-session/providers/google";
 import Constants from "expo-constants";
 import {
-  createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithCredential,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Button, Input, Text } from "tamagui";
-import { useAuth } from "../context/auth-context";
+import { useAuth } from "../../context/auth-context";
+import SignUp from "./SignUp";
 
 export default function AccountScreen() {
   const { loading: authLoading } = useAuth();
+
+  const [isSignUp, setIsSignUp] = useState(false); // State to toggle between Login and SignUp
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,19 +25,6 @@ export default function AccountScreen() {
   useEffect(() => {
     setLoading(authLoading);
   }, [authLoading]);
-
-  const handleSignup = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const auth = getFirebaseAuth();
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleLogin = async () => {
     setLoading(true);
@@ -50,8 +41,6 @@ export default function AccountScreen() {
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     clientId: Constants.expoConfig?.extra?.googleCloudConfig.clientId,
-    // iosClientId: "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com", // Replace with your iOS Client ID
-    // androidClientId: "YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com", // Replace with your Android Client ID
     redirectUri: "http://localhost:8081",
   });
 
@@ -61,12 +50,24 @@ export default function AccountScreen() {
       if (response?.type === "success") {
         const { id_token } = response.params;
 
-        const auth = getFirebaseAuth(); // Make sure this uses the same instance
+        const auth = getFirebaseAuth();
         const credential = GoogleAuthProvider.credential(id_token);
 
         try {
-          await signInWithCredential(auth, credential);
-          console.log("✅ User signed in with Google!");
+          const userCredential = await signInWithCredential(auth, credential);
+          const user = userCredential.user;
+
+          // Create a Firestore document for the user if it doesn't exist
+          const userDocRef = doc(db, "users", user.uid);
+          await setDoc(userDocRef, {
+            email: user.email,
+            name: user.displayName || "Anonymous",
+            createdAt: new Date().toISOString(),
+          });
+
+          console.log(
+            "✅ User signed in with Google and Firestore document created!"
+          );
         } catch (error) {
           console.error("❌ Error signing in with Google:", error);
         }
@@ -75,6 +76,10 @@ export default function AccountScreen() {
 
     authenticateWithGoogle();
   }, [response]);
+
+  if (isSignUp) {
+    return <SignUp setIsSignUp={setIsSignUp} />; // Pass setIsSignUp to SignUp for toggling back
+  }
 
   return (
     <>
@@ -107,8 +112,8 @@ export default function AccountScreen() {
         {loading ? "Logging in..." : "Login with Email"}
       </Button>
 
-      <Button theme="active" onPress={handleSignup}>
-        {loading ? "Signing up..." : "Sign Up with Email"}
+      <Button theme="active" onPress={() => setIsSignUp(true)}>
+        Sign Up with Email
       </Button>
 
       <Button theme="active" disabled={!request} onPress={() => promptAsync()}>
