@@ -8,7 +8,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { Button, Input, Text, YStack } from "tamagui";
+import { Button, Input, Text } from "tamagui";
 import { useAuth } from "../context/auth-context";
 
 export default function AccountScreen() {
@@ -77,13 +77,7 @@ export default function AccountScreen() {
   }, [response]);
 
   return (
-    <YStack
-      flex={1}
-      justifyContent="center"
-      alignItems="center"
-      padding="$4"
-      gap="$3"
-    >
+    <>
       <Text fontSize="$8" fontWeight="800">
         Log in
       </Text>
@@ -120,6 +114,6 @@ export default function AccountScreen() {
       <Button theme="active" disabled={!request} onPress={() => promptAsync()}>
         {loading ? "Signing in with Google..." : "Sign in with Google"}
       </Button>
-    </YStack>
+    </>
   );
 }

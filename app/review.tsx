@@ -7,7 +7,6 @@ export default function ReviewScreen() {
   return (
     <View style={{ padding: 20 }}>
       <Text>Leaving a review for Cafe ID: {cafeId}</Text>
-      {/* Form elements for rating, comments, etc. */}
     </View>
   );
 }

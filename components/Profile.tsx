@@ -1,6 +1,6 @@
 import { getFirebaseAuth } from "@/lib/firebase-auth";
 import { signOut, User } from "firebase/auth";
-import { Button, Text, YStack } from "tamagui";
+import { Button, Text } from "tamagui";
 
 export default function AccountScreen({ user }: { user: User }) {
   const handleLogout = async () => {
@@ -13,13 +13,7 @@ export default function AccountScreen({ user }: { user: User }) {
   };
 
   return (
-    <YStack
-      flex={1}
-      justifyContent="center"
-      alignItems="center"
-      padding="$4"
-      gap="$3"
-    >
+    <>
       <Text fontSize="$8" fontWeight="800">
         Welcome
       </Text>
@@ -28,6 +22,6 @@ export default function AccountScreen({ user }: { user: User }) {
       <Button onPress={handleLogout} theme="active">
         Log out
       </Button>
-    </YStack>
+    </>
   );
 }

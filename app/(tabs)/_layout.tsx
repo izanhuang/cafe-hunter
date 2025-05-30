@@ -5,7 +5,9 @@ import { ActivityIndicator } from "react-native";
 export default function TabsLayout() {
   const { user, loading } = useAuth();
 
-  if (loading) return <ActivityIndicator />;
+  if (loading) {
+    return <ActivityIndicator />;
+  }
 
   return (
     <Tabs screenOptions={{ headerShown: false }}>

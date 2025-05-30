@@ -7,23 +7,16 @@ export default function AccountScreen() {
   const { user, loading } = useAuth();
   console.log("AccountScreen user:", user);
 
-  if (loading) {
-    return (
-      <YStack
-        flex={1}
-        justifyContent="center"
-        alignItems="center"
-        padding="$4"
-        gap="$3"
-      >
-        <Text fontSize="$5">Loading...</Text>
-      </YStack>
-    );
-  }
-
-  if (!user) {
-    return <Login />;
-  }
-
-  return <Profile user={user} />;
+  return (
+    <YStack
+      flex={1}
+      justifyContent="center"
+      alignItems="center"
+      padding="$4"
+      gap="$3"
+    >
+      {loading && <Text fontSize="$5">Loading...</Text>}
+      {user ? <Profile user={user} /> : <Login />}
+    </YStack>
+  );
 }
